@@ -1,18 +1,15 @@
-# Goblin Den
+# Dice Mason
 ---------------
 ## Description
 
 A 3D Dice roller made with [Three.js](https://github.com/mrdoob/three.js/) and [Cannon.js](https://github.com/schteppe/cannon.js). <br/>
-Credits for random dice algorithm goes to http://a.teall.info/dice/
 
 ## Getting Started
 
 First, run the development server:
 
 ```bash
-npm run dev
-# or
-yarn dev
+pnpm dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
