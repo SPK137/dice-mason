@@ -76,13 +76,13 @@ export default function DiceTray() {
         <pointLight position={[-5, 5, -5]} intensity={0.4} color="#9B7EFF" />
 
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0, 0]} receiveShadow>
-          <planeGeometry args={[10, 10]} />
+          <planeGeometry args={[20, 20]} />
           <meshStandardMaterial color="#1A1A24" roughness={0.9} />
         </mesh>
 
         <Grid
           position={[0, 0.01, 0]}
-          args={[10, 10]}
+          args={[20, 20]}
           cellColor="#2E2E42"
           sectionColor="#2E2E42"
           fadeDistance={12}
@@ -99,6 +99,8 @@ export default function DiceTray() {
           minDistance={4}
           maxDistance={14}
           maxPolarAngle={Math.PI / 2.2}
+          minAzimuthAngle={-Math.PI / 2.2}
+          maxAzimuthAngle={Math.PI / 2.2}
         />
       </Canvas>
 
@@ -168,7 +170,7 @@ export default function DiceTray() {
             {diceCount}d6
           </span>
           <button
-            onClick={() => setDiceCount((c) => Math.min(10, c + 1))}
+            onClick={() => setDiceCount((c) => Math.min(12, c + 1))}
             className="w-8 h-8 rounded-lg flex items-center justify-center text-primary text-lg"
             style={{ background: "#1A1A24", border: "1px solid #2E2E42" }}
           >

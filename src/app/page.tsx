@@ -10,7 +10,7 @@ export default function Home() {
         <h1 className="text-4xl text-primary" style={{ fontFamily: "var(--font-display)" }}>
           Dicemason
         </h1>
-        <p className="text-muted">The guild of dice crafters</p>
+        <p className="text-muted">Craft and roll your dream dice</p>
       </nav>
     </>
   );

@@ -1,6 +1,51 @@
 import { useEffect, useRef } from "react";
 import * as CANNON from "cannon-es";
 
+// Export materials so dicePhysics.ts can assign them to bodies
+export const groundMaterial = new CANNON.Material("ground");
+export const wallMaterial = new CANNON.Material("wall");
+export const diceMaterial = new CANNON.Material("dice");
+
+function setupContactMaterials(world: CANNON.World): void {
+  // --- Contact Materials ---
+
+    // Die on ground — slight bounce, low friction so dice slide to rest
+    world.addContactMaterial(new CANNON.ContactMaterial(
+      diceMaterial,
+      groundMaterial,
+      {
+        friction: 0.3,
+        restitution: 0.35,
+        contactEquationStiffness: 1e8,
+        contactEquationRelaxation: 3,
+      }
+    ));
+
+    // Die on wall — very slippery so dice don't stick to walls
+    world.addContactMaterial(new CANNON.ContactMaterial(
+      diceMaterial,
+      wallMaterial,
+      {
+        friction: 0.0,        // near zero — walls are like glass
+        restitution: 0.7,
+        contactEquationStiffness: 1e8,
+        contactEquationRelaxation: 3,
+      }
+    ));
+
+    // Die on die — low friction so dice slide off each other naturally
+    world.addContactMaterial(new CANNON.ContactMaterial(
+      diceMaterial,
+      diceMaterial,
+      {
+        friction: 0.02,
+        restitution: 2,     // less bouncy die-to-die than die-to-ground
+        contactEquationStiffness: 1e8,
+        contactEquationRelaxation: 3,
+      }
+    ));
+}
+
 export function usePhysicsWorld() {
   const worldRef = useRef<CANNON.World | null>(null);
 
@@ -12,6 +57,8 @@ export function usePhysicsWorld() {
     world.broadphase = new CANNON.NaiveBroadphase();
     world.allowSleep = true;
 
+    setupContactMaterials(world);
+
     // Ground plane — the table surface
     const groundBody = new CANNON.Body({
       type: CANNON.Body.STATIC,
@@ -22,10 +69,10 @@ export function usePhysicsWorld() {
 
     // Invisible walls to keep dice in tray
     const wallShapes = [
-      { pos: [0, 0, -5], euler: [0, 0, 0] },         // back
-      { pos: [0, 0, 5],  euler: [0, Math.PI, 0] },    // front
-      { pos: [-5, 0, 0], euler: [0, Math.PI / 2, 0] },// left
-      { pos: [5, 0, 0],  euler: [0, -Math.PI / 2, 0] },// right
+      { pos: [0, 0, -6], euler: [0, 0, 0] },         // back
+      { pos: [0, 0, 4],  euler: [0, Math.PI, 0] },    // front
+      { pos: [-7.5, 0, 0], euler: [0, Math.PI / 2, 0] },// left
+      { pos: [7.5, 0, 0],  euler: [0, -Math.PI / 2, 0] },// right
     ];
 
     wallShapes.forEach(({ pos, euler }) => {
