@@ -19,7 +19,7 @@ const STAGGER_MS = 80; // delay between each die throw
 const DICE_SCALE = 0.5;
 
 export default function DiceTray() {
-  const { setHasResult } = useRollContext();
+  const { hasResult, setHasResult } = useRollContext();
 
   const worldRef = usePhysicsWorld();
   const [dieBodies, setDieBodies] = useState<CANNON.Body[]>([]);
@@ -32,7 +32,6 @@ export default function DiceTray() {
     const values = readAllD6Results(bodies);
     setResults(values);
     setIsRolling(false);
-    setHasResult(true);
   }, []));
 
   const handleRoll = useCallback(() => {
@@ -40,6 +39,7 @@ export default function DiceTray() {
 
     setResults([]);
     setIsRolling(true);
+    if (!hasResult) setHasResult(true);
 
     // Clear existing dice
     dieBodies.forEach((body) => worldRef.current!.removeBody(body));
@@ -130,7 +130,7 @@ export default function DiceTray() {
                 return (
                   <div
                     key={i}
-                    className="w-12 h-12 rounded-lg flex items-center justify-center text-xl font-bold opacity-75"
+                    className="w-12 h-12 rounded-lg flex items-center justify-center text-xl font-bold opacity-75 "
                     style={{
                       background: "#1A1A24",
                       border: `2px solid ${color}`,
