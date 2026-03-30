@@ -6,6 +6,7 @@ export interface FaceTextureOptions {
   textColor: string;
   font?: string;
   size?: number;
+  textScale?: number;
 }
 
 export function createFaceTexture(options: FaceTextureOptions): THREE.CanvasTexture {
@@ -15,6 +16,7 @@ export function createFaceTexture(options: FaceTextureOptions): THREE.CanvasText
     textColor,
     font = "Cinzel",
     size = 256,
+    textScale = 0.52
   } = options;
 
   const canvas = document.createElement("canvas");
@@ -36,7 +38,7 @@ export function createFaceTexture(options: FaceTextureOptions): THREE.CanvasText
   ctx.stroke();
 
   // Number
-  const fontSize = size * 0.52;
+  const fontSize = size * textScale;
   ctx.fillStyle = textColor;
   ctx.font = `bold ${fontSize}px ${font}, serif`;
   ctx.textAlign = "center";
@@ -75,9 +77,17 @@ export function createD6Textures(
   // 3: -Y (bottom)= 6
   // 4: +Z (front) = 3
   // 5: -Z (back)  = 4
-  const faceValues = ["2", "5", "1", "6", "3", "4"];
+  const faceValues: {value: string, textScale?: number}[] = [
+    { value: "2", }, 
+    { value: "5", }, 
+    { value: "1", }, 
+    { value: "6", }, 
+    // { value: "DOM", textScale: 0.30}, 
+    { value: "3", }, 
+    { value: "4", }
+  ];
 
-  return faceValues.map((value) =>
-    createFaceTexture({ value, backgroundColor: bodyColor, textColor })
+  return faceValues.map((face) =>
+    createFaceTexture({ value: face.value, backgroundColor: bodyColor, textColor, textScale: face.textScale })
   );
 }

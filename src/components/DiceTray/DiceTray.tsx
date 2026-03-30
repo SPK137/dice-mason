@@ -14,6 +14,9 @@ import { useKeyboardRoll } from "@/hooks/useKeyboardRoll";
 import { readAllD6Results, readD6TopFace } from "@/lib/faceReader";
 import DynamicWalls from "./DynamicWalls";
 import { useRollContext } from "@/context/RollContext";
+import RollResult from "./RollResult";
+import { useMobile } from "@/hooks/useMobile";
+import { getRenderConfig } from "@/lib/renderConfig";
 
 const STAGGER_MS = 80; // delay between each die throw
 const DICE_SCALE = 0.5;
@@ -22,10 +25,13 @@ export default function DiceTray() {
   const { hasResult, setHasResult } = useRollContext();
 
   const worldRef = usePhysicsWorld();
+  const { tier } = useMobile();
+  const renderConfig = getRenderConfig(tier);
+
   const [dieBodies, setDieBodies] = useState<CANNON.Body[]>([]);
   const [results, setResults] = useState<number[]>([]);
   const [isRolling, setIsRolling] = useState(false);
-  const [diceCount, setDiceCount] = useState(2); // how many d6s to rol
+  const [diceCount, setDiceCount] = useState(6); // how many d6s to rol
 
   // Fire when all dice have settled
   useMultiDieSleep(dieBodies, useCallback((bodies: CANNON.Body[]) => {
@@ -77,7 +83,7 @@ export default function DiceTray() {
           position={[5, 10, 5]}
           intensity={1.2}
           castShadow
-          shadow-mapSize={[2048, 2048]}
+          shadow-mapSize={[renderConfig.shadowMapSize, renderConfig.shadowMapSize]}
         />
         <pointLight position={[-5, 5, -5]} intensity={0.4} color="#9B7EFF" />
 
@@ -94,11 +100,11 @@ export default function DiceTray() {
           fadeDistance={12}
         />
 
-        {worldRef.current && <PhysicsRunner worldRef={worldRef} />}
+        {worldRef.current && <PhysicsRunner worldRef={worldRef} physicsFps={renderConfig.physicsFps}/>}
         {worldRef.current && <DynamicWalls worldRef={worldRef} />}
 
         {dieBodies.map((body, i) => (
-          <D6Mesh key={i} physicsBody={body} scale={DICE_SCALE}/>
+          <D6Mesh key={i} physicsBody={body} scale={DICE_SCALE} renderConfig={renderConfig}/>
         ))}
 
         <OrbitControls
@@ -112,53 +118,7 @@ export default function DiceTray() {
         />
       </Canvas>
 
-      {/* Results Display */}
-      <div className="absolute top-8 left-1/2 -translate-x-1/2 text-center max-w-screen w-full">
-        {isRolling && (
-          <p className="text-muted text-lg" style={{ fontFamily: "var(--font-display)" }}>
-            Rolling...
-          </p>
-        )}
-        {results.length > 0 && !isRolling && (
-          <div className="flex flex-col items-center gap-2">
-            {/* Individual results */}
-            <div className="flex gap-3 flex-wrap justify-center">
-              {results.map((r, i) => {
-                const isMax = r === 6;
-                const isMin = r === 1;
-                const color = isMax ? "#4ADE80" : isMin ? "#F87171" : "#F0EEF8";
-                return (
-                  <div
-                    key={i}
-                    className="w-12 h-12 rounded-lg flex items-center justify-center text-xl font-bold opacity-75 "
-                    style={{
-                      background: "#1A1A24",
-                      border: `2px solid ${color}`,
-                      color,
-                      fontFamily: "var(--font-display)",
-                    }}
-                  >
-                    {r}
-                  </div>
-                );
-              })}
-            </div>
-
-            {/* Total */}
-            {results.length > 1 && (
-              <div className="flex flex-col items-center">
-                <p className="text-muted text-xs tracking-widest uppercase">Total</p>
-                <p
-                  className="text-6xl font-bold"
-                  style={{ fontFamily: "var(--font-display)", color: "#F0EEF8" }}
-                >
-                  {total}
-                </p>
-              </div>
-            )}
-          </div>
-        )}
-      </div>
+      <RollResult isRolling = {isRolling} results = {results} total = {total}/>
 
       {/* Controls */}
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-4">
@@ -189,20 +149,20 @@ export default function DiceTray() {
         {/* Roll button */}
         <button
           onClick={handleRoll}
-          className="px-8 py-4 rounded-xl text-primary text-lg tracking-wide transition-all opacity-90"
+          className="px-8 py-4 rounded-xl text-primary text-lg tracking-wide transition-all opacity-90 hover:bg-accent-hover bg-accent"
           style={{
-            background: "#7C5CEF",
+            // background: "#7C5CEF",
             fontFamily: "var(--font-display)",
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.background = "#9B7EFF")}
-          onMouseLeave={(e) => (e.currentTarget.style.background = "#7C5CEF")}
         >
           {isRolling ? "Rolling..." : `Roll ${diceCount}d6`}
         </button>
 
-        <p className="text-muted text-xs tracking-widest">
-          SPACE or R to roll
-        </p>
+        { !renderConfig.isMobile && 
+            <p className="text-muted text-xs tracking-widest">
+              SPACE or R to roll
+            </p>
+        }
       </div>
     </div>
   );

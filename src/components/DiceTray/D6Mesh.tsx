@@ -5,19 +5,22 @@ import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import * as CANNON from "cannon-es";
 import { createD6Textures } from "@/lib/faceTexture";
+import { RenderConfig } from "@/lib/renderConfig";
 
 interface D6MeshProps {
   physicsBody: CANNON.Body;
   color?: string;
   faceColor?: string;
   scale?: number;
+  renderConfig: RenderConfig;
 }
 
 export default function D6Mesh({
   physicsBody,
   color = "#7C5CEF",
   faceColor = "#F0EEF8",
-  scale = 1.0
+  scale = 1.0,
+  renderConfig
 }: D6MeshProps) {
   const meshRef = useRef<THREE.Mesh>(null);
 
@@ -47,7 +50,7 @@ export default function D6Mesh({
 
   return (
     <mesh ref={meshRef} castShadow receiveShadow material={materials}>
-      <boxGeometry args={[1 * scale, 1 * scale, 1 * scale]} />
+      <boxGeometry args={[1 * scale, 1 * scale, 1 * scale, renderConfig.boxSegments, renderConfig.boxSegments, renderConfig.boxSegments]} />
     </mesh>
   );
 }
