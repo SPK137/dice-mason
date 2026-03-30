@@ -1,7 +1,7 @@
 "use client";
 
 import * as THREE from "three";
-import { useRef, useState, useCallback } from "react";
+import { useRef, useState, useCallback, useContext } from "react";
 import { Canvas } from "@react-three/fiber";
 import { OrbitControls, Grid } from "@react-three/drei";
 import * as CANNON from "cannon-es";
@@ -12,10 +12,15 @@ import PhysicsRunner from "./PhysicsRunner";
 import { useMultiDieSleep } from "@/hooks/useDieSleep";
 import { useKeyboardRoll } from "@/hooks/useKeyboardRoll";
 import { readAllD6Results, readD6TopFace } from "@/lib/faceReader";
+import DynamicWalls from "./DynamicWalls";
+import { useRollContext } from "@/context/RollContext";
 
 const STAGGER_MS = 80; // delay between each die throw
+const DICE_SCALE = 0.5;
 
 export default function DiceTray() {
+  const { setHasResult } = useRollContext();
+
   const worldRef = usePhysicsWorld();
   const [dieBodies, setDieBodies] = useState<CANNON.Body[]>([]);
   const [results, setResults] = useState<number[]>([]);
@@ -27,6 +32,7 @@ export default function DiceTray() {
     const values = readAllD6Results(bodies);
     setResults(values);
     setIsRolling(false);
+    setHasResult(true);
   }, []));
 
   const handleRoll = useCallback(() => {
@@ -43,7 +49,7 @@ export default function DiceTray() {
     for (let i = 0; i < diceCount; i++) {
       setTimeout(() => {
         if (!worldRef.current) return;
-        const body = createD6Body(worldRef.current);
+        const body = createD6Body(worldRef.current, DICE_SCALE);
         throwD6Body(body);
         newBodies.push(body);
         if (newBodies.length === diceCount) {
@@ -63,7 +69,7 @@ export default function DiceTray() {
       {/* 3D Canvas */}
       <Canvas
         shadows={{ type: THREE.PCFShadowMap }}
-        camera={{ position: [0, 8, 8], fov: 45 }}
+        camera={{ position: [0, 8, 0], fov: 45, rotation: [0, Math.PI, 0] }}
         style={{ background: "#0F0F14" }}
       >
         <ambientLight intensity={0.4} />
@@ -89,12 +95,14 @@ export default function DiceTray() {
         />
 
         {worldRef.current && <PhysicsRunner worldRef={worldRef} />}
+        {worldRef.current && <DynamicWalls worldRef={worldRef} />}
 
         {dieBodies.map((body, i) => (
-          <D6Mesh key={i} physicsBody={body} />
+          <D6Mesh key={i} physicsBody={body} scale={DICE_SCALE}/>
         ))}
 
         <OrbitControls
+          enabled={false}
           enablePan={false}
           minDistance={4}
           maxDistance={14}
@@ -105,7 +113,7 @@ export default function DiceTray() {
       </Canvas>
 
       {/* Results Display */}
-      <div className="absolute top-8 left-1/2 -translate-x-1/2 text-center">
+      <div className="absolute top-8 left-1/2 -translate-x-1/2 text-center max-w-screen w-full">
         {isRolling && (
           <p className="text-muted text-lg" style={{ fontFamily: "var(--font-display)" }}>
             Rolling...
@@ -114,7 +122,7 @@ export default function DiceTray() {
         {results.length > 0 && !isRolling && (
           <div className="flex flex-col items-center gap-2">
             {/* Individual results */}
-            <div className="flex gap-3">
+            <div className="flex gap-3 flex-wrap justify-center">
               {results.map((r, i) => {
                 const isMax = r === 6;
                 const isMin = r === 1;
@@ -122,7 +130,7 @@ export default function DiceTray() {
                 return (
                   <div
                     key={i}
-                    className="w-12 h-12 rounded-lg flex items-center justify-center text-xl font-bold"
+                    className="w-12 h-12 rounded-lg flex items-center justify-center text-xl font-bold opacity-75"
                     style={{
                       background: "#1A1A24",
                       border: `2px solid ${color}`,
@@ -181,7 +189,7 @@ export default function DiceTray() {
         {/* Roll button */}
         <button
           onClick={handleRoll}
-          className="px-8 py-4 rounded-xl text-primary text-lg tracking-wide transition-all"
+          className="px-8 py-4 rounded-xl text-primary text-lg tracking-wide transition-all opacity-90"
           style={{
             background: "#7C5CEF",
             fontFamily: "var(--font-display)",

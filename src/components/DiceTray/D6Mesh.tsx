@@ -10,12 +10,14 @@ interface D6MeshProps {
   physicsBody: CANNON.Body;
   color?: string;
   faceColor?: string;
+  scale?: number;
 }
 
 export default function D6Mesh({
   physicsBody,
   color = "#7C5CEF",
   faceColor = "#F0EEF8",
+  scale = 1.0
 }: D6MeshProps) {
   const meshRef = useRef<THREE.Mesh>(null);
 
@@ -45,7 +47,7 @@ export default function D6Mesh({
 
   return (
     <mesh ref={meshRef} castShadow receiveShadow material={materials}>
-      <boxGeometry args={[1, 1, 1]} />
+      <boxGeometry args={[1 * scale, 1 * scale, 1 * scale]} />
     </mesh>
   );
 }

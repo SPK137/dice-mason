@@ -27,7 +27,7 @@ function setupContactMaterials(world: CANNON.World): void {
       wallMaterial,
       {
         friction: 0.0,        // near zero — walls are like glass
-        restitution: 0.7,
+        restitution: 3,
         contactEquationStiffness: 1e8,
         contactEquationRelaxation: 3,
       }
@@ -39,7 +39,7 @@ function setupContactMaterials(world: CANNON.World): void {
       diceMaterial,
       {
         friction: 0.02,
-        restitution: 2,     // less bouncy die-to-die than die-to-ground
+        restitution: 5,     // less bouncy die-to-die than die-to-ground
         contactEquationStiffness: 1e8,
         contactEquationRelaxation: 3,
       }
@@ -66,24 +66,6 @@ export function usePhysicsWorld() {
     });
     groundBody.quaternion.setFromEuler(-Math.PI / 2, 0, 0);
     world.addBody(groundBody);
-
-    // Invisible walls to keep dice in tray
-    const wallShapes = [
-      { pos: [0, 0, -6], euler: [0, 0, 0] },         // back
-      { pos: [0, 0, 4],  euler: [0, Math.PI, 0] },    // front
-      { pos: [-7.5, 0, 0], euler: [0, Math.PI / 2, 0] },// left
-      { pos: [7.5, 0, 0],  euler: [0, -Math.PI / 2, 0] },// right
-    ];
-
-    wallShapes.forEach(({ pos, euler }) => {
-      const wall = new CANNON.Body({
-        type: CANNON.Body.STATIC,
-        shape: new CANNON.Plane(),
-      });
-      wall.position.set(pos[0], pos[1], pos[2]);
-      wall.quaternion.setFromEuler(euler[0], euler[1], euler[2]);
-      world.addBody(wall);
-    });
 
     worldRef.current = world;
 
