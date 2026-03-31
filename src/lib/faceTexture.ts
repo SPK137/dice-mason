@@ -9,7 +9,23 @@ export interface FaceTextureOptions {
   textScale?: number;
 }
 
-export function createFaceTexture(options: FaceTextureOptions): THREE.CanvasTexture {
+export function createImageTexture(imagePath: string): THREE.Texture {
+  const textureLoader = new THREE.TextureLoader();
+  const texture = textureLoader.load(
+    imagePath,
+    // onLoad callback (optional)
+    function ( texture ) {
+        console.log('Texture loaded successfully', texture);
+    },
+    // onError callback (optional)
+    function ( err ) {
+        console.error( 'An error happened loading the texture.', err );
+    }
+  );
+  return texture;
+}
+
+export function createFaceTexture(options: FaceTextureOptions): THREE.Texture {
   const {
     value,
     backgroundColor,
@@ -18,6 +34,8 @@ export function createFaceTexture(options: FaceTextureOptions): THREE.CanvasText
     size = 256,
     textScale = 0.52
   } = options;
+
+  if (value === "DOM") return createImageTexture('/dom.png');
 
   const canvas = document.createElement("canvas");
   canvas.width = size;
@@ -69,7 +87,7 @@ export function createFaceTexture(options: FaceTextureOptions): THREE.CanvasText
 export function createD6Textures(
   bodyColor: string = "#7C5CEF",
   textColor: string = "#F0EEF8"
-): THREE.CanvasTexture[] {
+): THREE.Texture[] {
   // Three.js BoxGeometry face order:
   // 0: +X (right) = 2
   // 1: -X (left)  = 5
@@ -81,8 +99,8 @@ export function createD6Textures(
     { value: "2", }, 
     { value: "5", }, 
     { value: "1", }, 
-    { value: "6", }, 
-    // { value: "DOM", textScale: 0.30}, 
+    // { value: "6", }, 
+    { value: "DOM"}, 
     { value: "3", }, 
     { value: "4", }
   ];
