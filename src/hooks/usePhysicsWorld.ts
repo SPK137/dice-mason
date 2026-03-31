@@ -27,7 +27,7 @@ function setupContactMaterials(world: CANNON.World): void {
       wallMaterial,
       {
         friction: 0.0,        // near zero — walls are like glass
-        restitution: 3,
+        restitution: 1,
         contactEquationStiffness: 1e8,
         contactEquationRelaxation: 3,
       }
@@ -39,7 +39,7 @@ function setupContactMaterials(world: CANNON.World): void {
       diceMaterial,
       {
         friction: 0.02,
-        restitution: 5,     // less bouncy die-to-die than die-to-ground
+        restitution: 1,     // less bouncy die-to-die than die-to-ground
         contactEquationStiffness: 1e8,
         contactEquationRelaxation: 3,
       }
