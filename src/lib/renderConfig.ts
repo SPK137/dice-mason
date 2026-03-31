@@ -7,6 +7,7 @@ export interface RenderConfig {
   shadowMapSize: number;        // shadow resolution
   // Physics
   physicsFps: number;           // physics step rate
+  diceScale: number;
 }
 
 const configs: Record<DeviceTier, RenderConfig> = {
@@ -14,19 +15,22 @@ const configs: Record<DeviceTier, RenderConfig> = {
     isMobile: true,
     boxSegments: 1,
     shadowMapSize: 2048,
-    physicsFps: 30
+    physicsFps: 30,
+    diceScale: 0.4
   },
   tablet: {
     isMobile: true,
     boxSegments: 1,
     shadowMapSize: 2048,
-    physicsFps: 45
+    physicsFps: 45,
+    diceScale: 0.5
   },
   desktop: {
     isMobile: false,
     boxSegments: 2,
     shadowMapSize: 2048,
-    physicsFps: 60
+    physicsFps: 60,
+    diceScale: 0.5
   },
 };
 
