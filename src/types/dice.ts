@@ -2,12 +2,13 @@ export type DieType = 'd4' | 'd6' | 'd8' | 'd10' | 'd12' | 'd20' | 'd100' | 'fud
 
 export type MaterialPreset =
   | 'matte-plastic'
-  | 'gloss-resin'
+  // | 'gloss-resin'
   | 'metallic'
-  | 'stone'
-  | 'glow'
-  | 'wood'
-  | 'holographic';
+  // | 'stone'
+  // | 'glow'
+  // | 'wood'
+  // | 'holographic'
+  | 'glass';
 
 export interface MaterialConfig {
   preset: MaterialPreset;
